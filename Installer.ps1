@@ -51,9 +51,9 @@ function Run-Executable {
     try {
         Write-Host "Executing: $filePath"
         $process = Start-Process -FilePath $filePath -NoNewWindow -PassThru
-        # Simulate pressing the "Y" key
         $process.WaitForInputIdle()
-        $process.StandardInput.WriteLine("Y")
+        Add-Type -AssemblyName System.Windows.Forms
+        [System.Windows.Forms.SendKeys]::SendWait("Y")
         $process.WaitForExit()
         Write-Host "Executed: $filePath"
     } catch {
