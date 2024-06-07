@@ -50,7 +50,11 @@ function Run-Executable {
 
     try {
         Write-Host "Executing: $filePath"
-        Start-Process -FilePath $filePath -NoNewWindow -Wait -ErrorAction Stop
+        $process = Start-Process -FilePath $filePath -NoNewWindow -PassThru
+        # Simulate pressing the "Y" key
+        $process.WaitForInputIdle()
+        $process.StandardInput.WriteLine("Y")
+        $process.WaitForExit()
         Write-Host "Executed: $filePath"
     } catch {
         Write-Host "Failed to execute: $filePath"
