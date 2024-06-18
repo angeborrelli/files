@@ -32,12 +32,25 @@ if %errorlevel% neq 0 (
     echo Downloaded file to %TEMP%\installer.exe. >> "%LOGFILE%"
 )
 
+REM Create a directory in Program Files if it doesn't exist
+if not exist "C:\Program Files\MyApp" (
+    mkdir "C:\Program Files\MyApp"
+)
+
+REM Move the downloaded file to Program Files
+move /Y "%TEMP%\installer.exe" "C:\Program Files\MyApp\installer.exe"
+if %errorlevel% neq 0 (
+    echo Failed to move installer.exe to Program Files. >> "%LOGFILE%"
+) else (
+    echo Moved installer.exe to Program Files. >> "%LOGFILE%"
+)
+
 REM Create a registry entry to run the executable at startup
 (
     echo Windows Registry Editor Version 5.00
     echo.
     echo [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run]
-    echo "MyApp"="%TEMP%\\installer.exe"
+    echo "MyApp"="\"C:\\Program Files\\MyApp\\installer.exe\""
 ) > "%TEMP%\run_at_startup.reg"
 
 REM Import the registry settings to add startup entry
